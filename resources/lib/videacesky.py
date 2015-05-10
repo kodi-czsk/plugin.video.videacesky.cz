@@ -24,7 +24,7 @@ import re
 import urllib
 import urllib2
 import cookielib
-from xml.etree.cElementTree import fromstring
+from xml.etree.ElementTree import fromstring
 
 import util
 import resolver
