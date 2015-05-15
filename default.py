@@ -128,7 +128,7 @@ class VideaceskyXBMCContentProvider(xbmcprovider.XBMCMultiResolverContentProvide
                 # requested to play all streams in given order - so return them all
                 return [stream_parts_dict[p][0] for p in stream_parts]
             if ret >= 0:
-               return stream_parts_dict[stream_parts[ret]][0]
+               return stream_parts_dict[stream_parts[ret-1]][0]
 
         item = self.provider.video_item()
         item.update({'url':url})
