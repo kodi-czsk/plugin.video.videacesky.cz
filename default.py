@@ -76,7 +76,6 @@ class VideaceskyXBMCContentProvider(xbmcprovider.XBMCMultiResolverContentProvide
 	
     def play(self, item):
         stream = self.resolve(item['url'])
-        print type(stream)
         if type(stream) == type([]):
             # resolved to mutliple files, we'll feed playlist and play the first one
             playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
