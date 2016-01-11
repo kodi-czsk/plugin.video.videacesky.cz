@@ -158,7 +158,7 @@ class VideaceskyContentProvider(ContentProvider):
         resolved = []
         item = item.copy()
         url = self._url(item['url'])
-        data = util.substr(util.request(url), '<div class=\"postContent\"', '</div>')
+        data = util.substr(util.request(url), '<div class=\"postContent\"', '</script>')
         playlist = re.search('playlistfile=(.+?\.xml)', data)
         if playlist:
             playlistxml = fromstring(util.request(playlist.group(1))).find('channel')
@@ -174,8 +174,8 @@ class VideaceskyContentProvider(ContentProvider):
                     i['subs'] = subs
                 resolved += res[:]
         else:
-            resolved = resolver.findstreams(data, ['file=(?P<url>[^&]+)&amp'])
-            subs = re.search('captions\.file=.*?(http[^&]+)&amp', data)
+            resolved = resolver.findstreams(data, ['file: "(?P<url>.+?)"'])
+            subs = re.search('file: \"(?P<url>.+?.srt)\"', data)
             if resolved and subs:
                 for i in resolved:
                     i['subs'] = subs.group(1)
