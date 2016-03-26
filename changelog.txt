@@ -1,3 +1,5 @@
+[B]1.0.12:[/B]
+- oprava podle zmen na webu, vcetne prehravani playlistu
 [B]1.0.11:[/B]
 - rychla oprava podle zmen na webu, zatim nefunguje prehravani playlistu
 [B]1.0.7:[/B]
