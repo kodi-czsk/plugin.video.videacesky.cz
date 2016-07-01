@@ -1,3 +1,5 @@
+[B]1.0.14:[/B] 1. 07. 2016
+- oprava posledních změn na webu (jose1711)
 [B]1.0.13:[/B] 26. 03. 2016
 - oprava posledních změn na webu (tomkuba)
 [B]1.0.12:[/B]
