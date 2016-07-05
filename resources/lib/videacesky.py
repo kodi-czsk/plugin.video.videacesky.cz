@@ -51,7 +51,7 @@ class VideaceskyContentProvider(ContentProvider):
             return self.list_content(util.request(self._url(url)), self._url(url))
 
     def search(self, keyword):
-        return self.list('?s=' + urllib.quote(keyword))
+        return self.list('/hledat?q=' + urllib.quote(keyword))
 
     def categories(self):
         result = []
