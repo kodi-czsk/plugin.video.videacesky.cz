@@ -92,7 +92,7 @@ class VideaceskyXBMCContentProvider(xbmcprovider.XBMCMultiResolverContentProvide
             print 'Sending %s to player' % stream['url']
             li = xbmcgui.ListItem(path=stream['url'], iconImage='DefaulVideo.png')
             xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, li)
-            xbmcutil.load_subtitles(stream['subs'])
+            xbmcutil.load_subtitles(stream['subs'],stream['headers'])
 
     def resolve(self, url):
         def select_cb(resolved):
