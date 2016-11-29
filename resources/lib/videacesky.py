@@ -32,10 +32,13 @@ import resolver
 from provider import ResolveException
 from provider import ContentProvider
 
-class VideaceskyContentProvider(ContentProvider):
 
-    def __init__(self, username=None, password=None, filter=None, tmp_dir='/tmp'):
-        ContentProvider.__init__(self, 'videacesky.cz', 'http://www.videacesky.cz', username, password, filter, tmp_dir)
+class VideaceskyContentProvider(ContentProvider):
+    def __init__(self, username=None, password=None, filter=None,
+                 tmp_dir='/tmp'):
+        ContentProvider.__init__(self, 'videacesky.cz',
+                                 'http://www.videacesky.cz',
+                                 username, password, filter, tmp_dir)
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookielib.LWPCookieJar()))
         urllib2.install_opener(opener)
 
@@ -77,7 +80,9 @@ class VideaceskyContentProvider(ContentProvider):
 
     def list_top10(self, page):
         result = []
-        data = util.substr(page, '<div class=\"line-items no-wrapper no-padder', '<div class=\"my-pagination>')
+        data = util.substr(page,
+                           '<div class=\"line-items no-wrapper no-padder',
+                           '<div class=\"my-pagination>')
         pattern = '<article class=\"video-line.+?<a href=\"(?P<url>[^\"]+)\" *title=\"(?P<title>[^\"]+)\"(.+?)<img src=\"(?P<img>[^\"]+)\"'
         for m in re.finditer(pattern, data, re.IGNORECASE | re.DOTALL):
             item = self.video_item()
@@ -88,7 +93,8 @@ class VideaceskyContentProvider(ContentProvider):
 
     def list_content(self, page, url=None):
         result = []
-        if not url: url = self.base_url
+        if not url:
+            url = self.base_url
         data = util.substr(page, '<div class=\"items no-wrapper no-padder', '<div class=\"my-pagination>')
         pattern = '<article class=\"video\".+?<a href=\"(?P<url>[^\"]+)\" *title=\"(?P<title>[^\"]+)\"(.+?)<img src=\"(?P<img>[^\"]+)\".+?<p>(?P<plot>[^<]+?)<\/p>.+?<li class=\"i-published\".+?title=\"(?P<date>[^\"]+)\"'
         for m in re.finditer(pattern, data, re.IGNORECASE | re.DOTALL):
@@ -97,19 +103,19 @@ class VideaceskyContentProvider(ContentProvider):
             item['img'] = m.group('img').strip()
             item['plot'] = self.decode_plot(m.group('plot'))
             item['url'] = self.base_url[:-1] + m.group('url')
-            item['menu'] = {'$30060':{'list':'#related#' + item['url'], 'action-type':'list'}}
-            print item
+            item['menu'] = {'$30060': {'list': '#related#' + item['url'],
+                                       'action-type': 'list'}}
             self._filter(result, item)
         data = util.substr(page, '<ul class=\"my-pagination', '</div>')
         n = re.search('<li class=\"paginate_button previous *\"[^<]+<a href=\"(?P<url>[^\"]+)\">(?P<name>[^<]+)<', data)
         k = re.search('<li class=\"paginate_button next *\"[^<]+<a href=\"(?P<url>[^\"]+)\">(?P<name>[^<]+)<', data)
-        if not n == None:
+        if n is not None:
             item = self.dir_item()
             item['type'] = 'prev'
             # item['title'] = '%s - %s' % (m.group(1), n.group('name'))
             item['url'] = n.group('url')
             result.append(item)
-        if not k == None:
+        if k is not None:
             item = self.dir_item()
             item['type'] = 'next'
             # item['title'] = '%s - %s' % (m.group(1), k.group('name'))
@@ -119,7 +125,9 @@ class VideaceskyContentProvider(ContentProvider):
 
     def list_related(self, page):
         result = []
-        data = util.substr(page, '<div class=\"related\"', '<div class=\"postFooter\">')
+        data = util.substr(page,
+                           '<div class=\"related\"',
+                           '<div class=\"postFooter\">')
         pattern = '<li[^>]+><div[^<]+<img\ src=\"(?P<img>[^\"]+)\"[^<]+</a>\s+</div><a href=\"(?P<url>[^\"]+)\" title=\"(?P<title>[^\"]+)\">.+?</li>'
         for m in re.finditer(pattern, data, re.IGNORECASE | re.DOTALL):
             item = self.video_item()
@@ -153,10 +161,18 @@ class VideaceskyContentProvider(ContentProvider):
         item = item.copy()
         url = self._url(item['url'])
         data = util.substr(util.request(url), '<![CDATA[', '</script>')
-
-        playlist = re.search('''ihv_video_instance_\d+\.setup.+?(?P<jsondata>'playlist':.+?)width:''', data, re.MULTILINE | re.DOTALL)
-	jsondata = re.sub(' +',' ','{%s' % playlist.group('jsondata').replace('file:','"file":').replace('label:','"label":').replace('kind:','"kind":').replace('default:','"default":').replace('true','"true"').replace('],',']'))+'}'
-        jsondata=demjson.decode(jsondata)
+        playlist = re.search('''new mfVastVideo.+?(?P<jsondata>playlist:.+?)events:''',
+                             data, re.MULTILINE | re.DOTALL)
+        print 'playlist start ----'
+        print playlist
+        print 'playlist end ----'
+        jsondata = re.sub(' +',
+                          ' ',
+                          '{%s' % playlist.group('jsondata').replace('file:','"file":').replace('label:','"label":').replace('kind:','"kind":').replace('default:','"default":').replace('true','"true"').replace('],',']'))+'}'
+        print 'jsondata start ----'
+        print jsondata
+        print 'jsondata end ----'
+        jsondata = demjson.decode(jsondata)
 
         for playlist_item in jsondata['playlist']:
             video_url = resolver.findstreams([playlist_item['file']])
@@ -166,25 +182,25 @@ class VideaceskyContentProvider(ContentProvider):
                     i['subs'] = self.base_url[:-1]+subs[0]['file']
             resolved += video_url[:]
 
-        if not resolved:
-            raise ResolveException('Video nenalezeno')
+            if not resolved:
+                raise ResolveException('Video nenalezeno')
 
-        for i in resolved:
-            item = self.video_item()
-            try:
-                item['title'] = i['title']
-            except KeyError:
-                pass
-            item['url'] = i['url']
-            item['quality'] = i['quality']
-            item['surl'] = i['surl']
-            item['subs'] = i['subs']
-            item['headers'] = i['headers']
-            try:
-                item['fmt'] = i['fmt']
-            except KeyError:
-                pass
-            result.append(item)
-        if len(result) > 0 and select_cb:
-            return select_cb(result)
-        return result
+            for i in resolved:
+                item = self.video_item()
+                try:
+                    item['title'] = i['title']
+                except KeyError:
+                    pass
+                item['url'] = i['url']
+                item['quality'] = i['quality']
+                item['surl'] = i['surl']
+                item['subs'] = i['subs']
+                item['headers'] = i['headers']
+                try:
+                    item['fmt'] = i['fmt']
+                except KeyError:
+                    pass
+                result.append(item)
+            if len(result) > 0 and select_cb:
+                return select_cb(result)
+            return result

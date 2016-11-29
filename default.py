@@ -20,7 +20,14 @@
 # *
 # */
 import os
-import xbmc, xbmcaddon, xbmcgui, xbmcplugin, util, xbmcprovider, xbmcutil, resolver
+import xbmc
+import xbmcaddon
+import xbmcgui
+import xbmcplugin
+import util
+import xbmcprovider
+import xbmcutil
+import resolver
 from provider import ResolveException
 
 __scriptid__ = 'plugin.video.videacesky.cz'
@@ -29,9 +36,9 @@ __addon__ = xbmcaddon.Addon(id=__scriptid__)
 __language__ = __addon__.getLocalizedString
 __settings__ = __addon__.getSetting
 
-sys.path.append(os.path.join (__addon__.getAddonInfo('path'), 'resources', 'lib'))
+sys.path.append(os.path.join(__addon__.getAddonInfo('path'), 'resources', 'lib'))
 import videacesky
-settings = {'downloads':__addon__.getSetting('downloads'), 'quality':__addon__.getSetting('quality')}
+settings = {'downloads': __addon__.getSetting('downloads'), 'quality': __addon__.getSetting('quality')}
 
 
 def vp8_youtube_filter(stream):
@@ -73,7 +80,6 @@ def vp8_youtube_filter(stream):
 
 
 class VideaceskyXBMCContentProvider(xbmcprovider.XBMCMultiResolverContentProvider):
-	
     def play(self, item):
         stream = self.resolve(item['url'])
         if type(stream) == type([]):
