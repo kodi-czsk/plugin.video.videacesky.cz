@@ -160,7 +160,10 @@ class VideaceskyContentProvider(ContentProvider):
         resolved = []
         item = item.copy()
         url = self._url(item['url'])
-        data = util.substr(util.request(url), '<![CDATA[', '</script>')
+        data = util.substr(util.request(url), 'async type', '</script>')
+        print 'data start ----'
+        print data
+        print 'data end ----'
         playlist = re.search('''new mfVastVideo.+?(?P<jsondata>playlist:.+?)events:''',
                              data, re.MULTILINE | re.DOTALL)
         print 'playlist start ----'
