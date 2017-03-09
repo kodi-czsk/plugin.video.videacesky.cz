@@ -83,12 +83,13 @@ class VideaceskyContentProvider(ContentProvider):
         data = util.substr(page,
                            '<div class=\"line-items no-wrapper no-padder',
                            '<div class=\"my-pagination>')
-        pattern = '<article class=\"video-line.+?<a href=\"(?P<url>[^\"]+)\" *title=\"(?P<title>[^\"]+)\"(.+?)<img src=\"(?P<img>[^\"]+)\"'
+        pattern = '<article class=\"video-line.+?<a href=\"(?P<url>[^\"]+)\" *title=\"(?P<title>[^\"]+)\"(.+?)<img src=\"(?P<img>[^\"]+)\"(.+?)<div class=\"video-rating.+?\">(?P<rating>[^&]+)(.+?)<small>(?P<votes>[^x]+)'
         for m in re.finditer(pattern, data, re.IGNORECASE | re.DOTALL):
             item = self.video_item()
-            item['title'] = m.group('title')
+            item['title'] = self.format_title(m)
             item['url'] = self.base_url[:-1] + m.group('url')
             item['img'] = m.group('img').strip()
+            item['plot'] = self.format_rating(m)
             self._filter(result, item)
         return result
 
@@ -97,12 +98,12 @@ class VideaceskyContentProvider(ContentProvider):
         if not url:
             url = self.base_url
         data = util.substr(page, '<div class=\"items no-wrapper no-padder', '<div class=\"my-pagination>')
-        pattern = '<article class=\"video\".+?<a href=\"(?P<url>[^\"]+)\" *title=\"(?P<title>[^\"]+)\"(.+?)<img src=\"(?P<img>[^\"]+)\".+?<p>(?P<plot>[^<]+?)<\/p>.+?<li class=\"i-published\".+?title=\"(?P<date>[^\"]+)\"'
+        pattern = '<article class=\"video\".+?<a href=\"(?P<url>[^\"]+)\" *title=\"(?P<title>[^\"]+)\"(.+?)<img src=\"(?P<img>[^\"]+)\".+?<span class="rating.+?>(?P<rating>[^&]+).+?<p>(?P<plot>[^<]+?)<\/p>.+?<li class=\"i-published\".+?title=\"(?P<date>[^\"]+)\".+?<i class=\"fa fa-eye\"></i><span class=\"value\">(?P<votes>[^<]+)'
         for m in re.finditer(pattern, data, re.IGNORECASE | re.DOTALL):
             item = self.video_item()
-            item['title'] = m.group('title')
+            item['title'] = self.format_title(m)
             item['img'] = m.group('img').strip()
-            item['plot'] = self.decode_plot(m.group('plot'))
+            item['plot'] = self.decode_plot(m)
             item['year'] = re.search('[0-9]{4}', m.group('date')).group()
             item['url'] = self.base_url[:-1] + m.group('url')
             item['menu'] = {'$30060': {'list': '#related#' + item['url'],
@@ -139,7 +140,14 @@ class VideaceskyContentProvider(ContentProvider):
             self._filter(result, item)
         return result
 
-    def decode_plot(self, p):
+    def format_title(self, m):
+    	return "{} - {}%".format(m.group('title'), m.group('rating'))
+
+    def format_rating(self, m):
+    	return "{}%, {}x".format(m.group('rating'), m.group('votes'))
+
+    def decode_plot(self, m):
+    	p = m.group('plot')
         p = re.sub('<br[^>]*>', '', p)
         p = re.sub('<div[^>]+>', '', p)
         p = re.sub('<table.*', '', p)
@@ -155,7 +163,9 @@ class VideaceskyContentProvider(ContentProvider):
         p = re.sub('\[B\]\[B\]', '[B]', p)
         p = re.sub('\[/B\]\[/B\]', '[/B]', p)
         p = re.sub('\[B\][ ]*\[/B\]', '', p)
-        return util.decode_html(''.join(p)).encode('utf-8').strip()
+        plot = util.decode_html(''.join(p)).encode('utf-8').strip()
+        rating = self.format_rating(m)
+        return "{}\n{}".format(rating, plot)
 
     def resolve(self, item, captcha_cb=None, select_cb=None):
         result = []
