@@ -83,7 +83,7 @@ class VideaceskyContentProvider(ContentProvider):
         data = util.substr(page,
                            '<div class=\"line-items no-wrapper no-padder',
                            '<div class=\"my-pagination>')
-        pattern = '<article class=\"video-line.+?<a href=\"(?P<url>[^\"]+)\" *title=\"(?P<title>[^\"]+)\"(.+?)<img src=\"(?P<img>[^\"]+)\"(.+?)<div class=\"video-rating.+?\">(?P<rating>[^&]+)(.+?)<small>(?P<votes>[^x]+)'
+        pattern = '<article class=\"video-line.+?<a href=\"(?P<url>[^\"]+)\" *title=\"(?P<title>[^\"]+)\".+?<img src=\"(?P<img>[^\"]+)\".+?<div class=\"video-rating.+?\">(?P<rating>[^&]+).+?<small>(?P<votes>[^x]+)'
         for m in re.finditer(pattern, data, re.IGNORECASE | re.DOTALL):
             item = self.video_item()
             item['title'] = self.format_title(m)
