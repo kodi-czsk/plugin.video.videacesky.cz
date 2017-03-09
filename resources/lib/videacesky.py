@@ -88,6 +88,7 @@ class VideaceskyContentProvider(ContentProvider):
             item = self.video_item()
             item['title'] = m.group('title')
             item['url'] = self.base_url[:-1] + m.group('url')
+            item['img'] = m.group('img').strip()
             self._filter(result, item)
         return result
 
@@ -102,6 +103,7 @@ class VideaceskyContentProvider(ContentProvider):
             item['title'] = m.group('title')
             item['img'] = m.group('img').strip()
             item['plot'] = self.decode_plot(m.group('plot'))
+            item['year'] = re.search('[0-9]{4}', m.group('date')).group()
             item['url'] = self.base_url[:-1] + m.group('url')
             item['menu'] = {'$30060': {'list': '#related#' + item['url'],
                                        'action-type': 'list'}}
