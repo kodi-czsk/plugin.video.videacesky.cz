@@ -129,12 +129,12 @@ class VideaceskyContentProvider(ContentProvider):
     def list_related(self, page):
         result = []
         data = util.substr(page,
-                           '<div class=\"related\"',
-                           '<div class=\"postFooter\">')
-        pattern = '<li[^>]+><div[^<]+<img\ src=\"(?P<img>[^\"]+)\"[^<]+</a>\s+</div><a href=\"(?P<url>[^\"]+)\" title=\"(?P<title>[^\"]+)\">.+?</li>'
+                           '<div class=\"similarSliderInner\"',
+                           '<div class=\"comments-container\"')
+        pattern = '<article class=\"videoSimple.+?<a href=\"(?P<url>[^\"]+)\" *title=\"(?P<title>[^\"]+)\".+?<img src=\"(?P<img>[^\"]+)\".+?<span class="rating.+?>(?P<rating>[^&]+)'
         for m in re.finditer(pattern, data, re.IGNORECASE | re.DOTALL):
             item = self.video_item()
-            item['title'] = m.group('title')
+            item['title'] = self.format_title(m)
             item['img'] = m.group('img')
             item['url'] = m.group('url')
             self._filter(result, item)
