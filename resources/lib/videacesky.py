@@ -129,22 +129,22 @@ class VideaceskyContentProvider(ContentProvider):
     def list_related(self, page):
         result = []
         data = util.substr(page,
-                           '<div class=\"related\"',
-                           '<div class=\"postFooter\">')
-        pattern = '<li[^>]+><div[^<]+<img\ src=\"(?P<img>[^\"]+)\"[^<]+</a>\s+</div><a href=\"(?P<url>[^\"]+)\" title=\"(?P<title>[^\"]+)\">.+?</li>'
+                           '<div class=\"similarSliderInner\"',
+                           '<div class=\"comments-container\"')
+        pattern = '<article class=\"videoSimple.+?<a href=\"(?P<url>[^\"]+)\" *title=\"(?P<title>[^\"]+)\".+?<img src=\"(?P<img>[^\"]+)\".+?<span class="rating.+?>(?P<rating>[^&]+)'
         for m in re.finditer(pattern, data, re.IGNORECASE | re.DOTALL):
             item = self.video_item()
-            item['title'] = m.group('title')
+            item['title'] = self.format_title(m)
             item['img'] = m.group('img')
             item['url'] = m.group('url')
             self._filter(result, item)
         return result
 
     def format_title(self, m):
-    	return "{} - {}%".format(m.group('title'), m.group('rating'))
+    	return "{0} - {1}%".format(m.group('title'), m.group('rating'))
 
     def format_rating(self, m):
-    	return "{}%, {}x".format(m.group('rating'), m.group('votes'))
+    	return "{0}%, {1}x".format(m.group('rating'), m.group('votes'))
 
     def decode_plot(self, m):
     	p = m.group('plot')
@@ -165,7 +165,7 @@ class VideaceskyContentProvider(ContentProvider):
         p = re.sub('\[B\][ ]*\[/B\]', '', p)
         plot = util.decode_html(''.join(p)).encode('utf-8').strip()
         rating = self.format_rating(m)
-        return "{}\n{}".format(rating, plot)
+        return "{0}\n{1}".format(rating, plot)
 
     def resolve(self, item, captcha_cb=None, select_cb=None):
         result = []
