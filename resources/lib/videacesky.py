@@ -216,6 +216,9 @@ class VideaceskyContentProvider(ContentProvider):
                 except KeyError:
                     pass
                 result.append(item)
-            if len(result) > 0 and select_cb:
-                return select_cb(result)
-            return result
+
+        if len(result) > 0 and select_cb:
+            return select_cb(result)
+            
+        return result
+
