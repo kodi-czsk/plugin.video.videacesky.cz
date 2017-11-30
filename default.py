@@ -88,6 +88,9 @@ class VideaceskyXBMCContentProvider(xbmcprovider.XBMCMultiResolverContentProvide
             playlist.clear()
             for video in stream:
                 li = xbmcgui.ListItem(label=video['title'], path=video['url'], iconImage='DefaultVideo.png')
+                if video['subs'] != None and video['subs'] != '':
+                    li.setSubtitles([video['subs']])
+                    
                 playlist.add(video['url'], li)
             stream = stream[0]
         if stream:
