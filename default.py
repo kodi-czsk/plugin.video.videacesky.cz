@@ -88,6 +88,9 @@ class VideaceskyXBMCContentProvider(xbmcprovider.XBMCMultiResolverContentProvide
             playlist.clear()
             for video in stream:
                 li = xbmcgui.ListItem(label=video['title'], path=video['url'], iconImage='DefaultVideo.png')
+                if video['subs'] != None and video['subs'] != '':
+                    li.setSubtitles([video['subs']])
+                    
                 playlist.add(video['url'], li)
             stream = stream[0]
         if stream:
@@ -97,8 +100,16 @@ class VideaceskyXBMCContentProvider(xbmcprovider.XBMCMultiResolverContentProvide
                     stream['url'] += '|%s=%s' % (header, stream['headers'][header])
             print 'Sending %s to player' % stream['url']
             li = xbmcgui.ListItem(path=stream['url'], iconImage='DefaulVideo.png')
+            
+            sub = False
+            if xbmcaddon.Addon('xbmc.addon').getAddonInfo('version') > "16":
+                sub = True
+                if stream['subs'] != None and stream['subs'] != '':
+                    li.setSubtitles([stream['subs']])
+                
             xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, li)
-            xbmcutil.load_subtitles(stream['subs'])
+            if sub == False:
+                xbmcutil.load_subtitles(stream['subs'])
 
     def resolve(self, url):
         def select_cb(resolved):

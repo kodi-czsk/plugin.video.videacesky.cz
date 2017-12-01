@@ -1,3 +1,11 @@
+[B]1.0.21:[/B] 26. 11. 2017
+- Nova ikona (MarhyCZ)
+[B]1.0.20:[/B] 20. 11. 2017
+- nahodne nenacitani titulku (BrozikCZ)
+- oprava vice casti videii
+[B]1.0.19:[/B] 26. 6. 2017
+- opravena podobna videa (BrozikCZ)
+- oprava pro starsi verze Kodi
 [B]1.0.18:[/B] 9. 6. 2017
 - opravene prehravanie kvoli zmenam na webe (jose1711)
 [B]1.0.17:[/B] 7. 12. 2016
