@@ -1,3 +1,7 @@
+[B]1.0.23:[/B] 29. 12. 2017
+- zobrazovani delky videa (jose1711)
+[B]1.0.22:[/B] 30. 11. 2017
+- oprava titulku pro videa v serii (BrozikCZ)
 [B]1.0.21:[/B] 26. 11. 2017
 - Nova ikona (MarhyCZ)
 [B]1.0.20:[/B] 20. 11. 2017
