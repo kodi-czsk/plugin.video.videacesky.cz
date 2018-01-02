@@ -56,6 +56,10 @@ class VideaceskyContentProvider(ContentProvider):
     def search(self, keyword):
         return self.list('/hledat?q=' + urllib.quote(keyword))
 
+    def mmss_to_seconds(self, mmss):
+        minutes, seconds = [int(x) for x in mmss.split(':')]
+        return (minutes * 60 + seconds)
+
     def categories(self):
         result = []
         item = self.dir_item()
@@ -98,7 +102,7 @@ class VideaceskyContentProvider(ContentProvider):
         if not url:
             url = self.base_url
         data = util.substr(page, '<div class=\"items no-wrapper no-padder', '<div class=\"my-pagination>')
-        pattern = '<article class=\"video\".+?<a href=\"(?P<url>[^\"]+)\" *title=\"(?P<title>[^\"]+)\"(.+?)<img src=\"(?P<img>[^\"]+)\".+?<span class="rating.+?>(?P<rating>[^&]+).+?<p>(?P<plot>[^<]+?)<\/p>.+?<li class=\"i-published\".+?title=\"(?P<date>[^\"]+)\".+?<i class=\"fa fa-eye\"></i><span class=\"value\">(?P<votes>[^<]+)'
+        pattern = '<article class=\"video\".+?<a href=\"(?P<url>[^\"]+)\" *title=\"(?P<title>[^\"]+)\"(.+?)<img src=\"(?P<img>[^\"]+)\".+?<span class=\"duration\">(?P<duration>[^>]*)</span>.*?<span class="rating.+?>(?P<rating>[^&]+).+?<p>(?P<plot>[^<]+?)<\/p>.+?<li class=\"i-published\".+?title=\"(?P<date>[^\"]+)\".+?<i class=\"fa fa-eye\"></i><span class=\"value\">(?P<votes>[^<]+)'
         for m in re.finditer(pattern, data, re.IGNORECASE | re.DOTALL):
             item = self.video_item()
             item['title'] = self.format_title(m)
@@ -108,6 +112,10 @@ class VideaceskyContentProvider(ContentProvider):
             item['url'] = self.base_url[:-1] + m.group('url')
             item['menu'] = {'$30060': {'list': '#related#' + item['url'],
                                        'action-type': 'list'}}
+            try:
+                item['duration'] = self.mmss_to_seconds(m.group('duration'))
+            except ValueError:
+                pass
             self._filter(result, item)
         data = util.substr(page, '<ul class=\"my-pagination', '</div>')
         n = re.search('<li class=\"paginate_button previous *\"[^<]+<a href=\"(?P<url>[^\"]+)\">(?P<name>[^<]+)<', data)
