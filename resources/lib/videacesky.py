@@ -198,6 +198,7 @@ class VideaceskyContentProvider(ContentProvider):
         jsondata = demjson.decode(jsondata)
 
         for playlist_item in jsondata['playlist']:
+            playlist_item['file'] = playlist_item['file'].replace('time_continue=1&', '')
             video_url = resolver.findstreams([playlist_item['file']])
             subs = playlist_item['tracks']
             if video_url and subs:
