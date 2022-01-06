@@ -20,6 +20,10 @@
 # *
 # */
 import os
+
+sys.path.append(os.path.join (os.path.dirname(__file__), 'resources', 'lib'))
+import videacesky
+
 import xbmc
 import xbmcaddon
 import xbmcgui
@@ -28,6 +32,7 @@ import util
 import xbmcprovider
 import xbmcutil
 import resolver
+
 from provider import ResolveException
 
 __scriptid__ = 'plugin.video.videacesky.cz'
@@ -36,8 +41,8 @@ __addon__ = xbmcaddon.Addon(id=__scriptid__)
 __language__ = __addon__.getLocalizedString
 __settings__ = __addon__.getSetting
 
-sys.path.append(os.path.join(__addon__.getAddonInfo('path'), 'resources', 'lib'))
-import videacesky
+# sys.path.append(os.path.join(__addon__.getAddonInfo('path'), 'resources', 'lib'))
+
 settings = {'downloads': __addon__.getSetting('downloads'), 'quality': __addon__.getSetting('quality')}
 
 
@@ -158,5 +163,8 @@ class VideaceskyXBMCContentProvider(xbmcprovider.XBMCMultiResolverContentProvide
 params = util.params()
 if params == {}:
 	xbmcutil.init_usage_reporting(__scriptid__)
-VideaceskyXBMCContentProvider(videacesky.VideaceskyContentProvider(tmp_dir=xbmc.translatePath(__addon__.getAddonInfo('profile'))), settings, __addon__).run(params)
+# VideaceskyXBMCContentProvider(videacesky.VideaceskyContentProvider(tmp_dir=xbmc.translatePath(__addon__.getAddonInfo('profile'))), settings, __addon__).run(params)
+original_yt = __settings__('original_yt') == 'true'
+vc = videacesky.VideaceskyContentProvider(original_yt=original_yt, tmp_dir=xbmc.translatePath(__addon__.getAddonInfo('profile')))
 
+VideaceskyXBMCContentProvider(vc, settings, __addon__).run(params)
