@@ -1,0 +1,104 @@
+# Kodi Media Center language file
+# Addon Name: videacesky.cz
+# Addon id: plugin.video.videacesky.cz
+msgid ""
+msgstr ""
+
+"Language: cs_CZ\n"
+
+msgctxt "#30000"
+msgid "Size of search history"
+msgstr "Počet zapamatovaných hledání"
+
+msgctxt "#30001"
+msgid "Video is not available, check[CR]whether it works using web page."
+msgstr "Video není dostupné, zkontrolujte, [CR]zda funguje přehrávání na webu."
+
+msgctxt "#30002"
+msgid "Playing this video[CR]is not yet supported."
+msgstr ""
+
+msgctxt "#30003"
+msgid "[B]Latest episodes[/B]"
+msgstr "[B]Nejnovější epizody[/B]"
+
+msgctxt "#30004"
+msgid "Choose video source"
+msgstr "Zvolte zdroj"
+
+
+msgctxt "#30030"
+msgid "Downloads"
+msgstr "Složka pro stahování"
+
+msgctxt "#30031"
+msgid "Please setup downloads folder"
+msgstr "Nastavte prosím složku pro stahování"
+
+msgctxt "#30032"
+msgid "Notify when downloading"
+msgstr "Zobrazovat stav stahování"
+
+msgctxt "#30033"
+msgid " - display notification every"
+msgstr " - zobrazit stav každých"
+
+msgctxt "#30034"
+msgid "10%"
+msgstr ""
+
+msgctxt "#30035"
+msgid "5%"
+msgstr ""
+
+msgctxt "#30036"
+msgid "1%"
+msgstr ""
+
+msgctxt "#30037"
+msgid "Downloads"
+msgstr "Stažené soubory"
+
+msgctxt "#30050"
+msgid "Video quality"
+msgstr "Kvalita videa"
+
+msgctxt "#30051"
+msgid "Best"
+msgstr "Nejlepší"
+
+msgctxt "#30052"
+msgid "SD"
+msgstr ""
+
+msgctxt "#30053"
+msgid "720p"
+msgstr ""
+
+msgctxt "#30054"
+msgid "1080p"
+msgstr ""
+
+msgctxt "#30058"
+msgid "Filter vp8 videos"
+msgstr "Filtruj vp8 videa"
+
+msgctxt "#30059"
+msgid "*Play all*"
+msgstr "*Přehrát vše*"
+
+msgctxt "#30060"
+msgid "Related videos"
+msgstr "Podobná videa"
+
+msgctxt "#30061"
+msgid "Run original Youtube addon"
+msgstr "Použi originál Youtube doplnok"
+
+msgctxt "#30103"
+msgid "General"
+msgstr "Obecné"
+
+msgctxt "#31000"
+msgid "Usage of plugin is tracked whenever you play or download video."
+msgstr "Data o použití jsou zaslána pouze v okamžiku, kdy spustíte přehrávání nebo stahování videa doplňkem."
