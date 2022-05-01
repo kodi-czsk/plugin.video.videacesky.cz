@@ -22,9 +22,7 @@
 
 import re
 import urllib
-import urllib2
-import cookielib
-from xml.etree.ElementTree import fromstring
+# import cookielib
 from demjson import demjson
 
 import util
@@ -40,8 +38,8 @@ class VideaceskyContentProvider(ContentProvider):
         ContentProvider.__init__(self, 'videacesky.cz',
                                  'http://www.videacesky.cz',
                                  username, password, filter, tmp_dir)
-        opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookielib.LWPCookieJar()))
-        urllib2.install_opener(opener)
+        # opener = urllib.build_opener(urllib.HTTPCookieProcessor(cookielib.LWPCookieJar()))
+        # urllib.install_opener(opener)
 
     def capabilities(self):
         return ['categories', 'resolve', 'search']
@@ -156,7 +154,7 @@ class VideaceskyContentProvider(ContentProvider):
     	return "{0}%, {1}x".format(m.group('rating'), m.group('votes'))
 
     def decode_plot(self, m):
-    	p = m.group('plot')
+        p = m.group('plot')
         p = re.sub('<br[^>]*>', '', p)
         p = re.sub('<div[^>]+>', '', p)
         p = re.sub('<table.*', '', p)
@@ -182,20 +180,20 @@ class VideaceskyContentProvider(ContentProvider):
         item = item.copy()
         url = self._url(item['url'])
         data = util.substr(util.request(url), 'async type', '</script>')
-        print 'data start ----'
-        print data
-        print 'data end ----'
+        print('data start ----')
+        print(data)
+        print('data end ----')
         playlist = re.search('''new mfJWPlayer.+?(?P<jsondata>playlist:.+?)events:''',
                              data, re.MULTILINE | re.DOTALL)
-        print 'playlist start ----'
-        print playlist
-        print 'playlist end ----'
+        print('playlist start ----')
+        print(playlist)
+        print('playlist end ----')
         jsondata = re.sub(' +',
                           ' ',
                           '{%s' % playlist.group('jsondata').replace('file:','"file":').replace('label:','"label":').replace('kind:','"kind":').replace('default:','"default":').replace('true','"true"').replace('],',']'))+'}'
-        print 'jsondata start ----'
-        print jsondata
-        print 'jsondata end ----'
+        print('jsondata start ----')
+        print(jsondata)
+        print('jsondata end ----')
         jsondata = demjson.decode(jsondata)
 
         for playlist_item in jsondata['playlist']:
@@ -230,6 +228,6 @@ class VideaceskyContentProvider(ContentProvider):
 
         if len(result) > 0 and select_cb:
             return select_cb(result)
-            
+
         return result
 

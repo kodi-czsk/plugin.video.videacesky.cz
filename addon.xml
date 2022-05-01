@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
-<addon id="plugin.video.videacesky.cz" name="videacesky.cz" provider-name="Libor Zoubek" version="1.0.25">
+<addon id="plugin.video.videacesky.cz" name="videacesky.cz" provider-name="Libor Zoubek" version="1.1.0">
   <requires>
-    <import addon="xbmc.python" version="2.1.0" />
-    <import addon="script.module.stream.resolver" version="1.6.17" />
-    <import addon="script.module.youtube.dl" version="19.912.0"/>
+    <import addon="xbmc.python" version="3.0.0" />
+    <import addon="script.module.stream.resolver" version="1.7.3" />
+    <import addon="script.module.youtube.dl" version="21.417.16"/> <!--https://github.com/nkvoronov/script.module.youtube.dl/tree/vmatrix-->
   </requires>
   <extension library="default.py" point="xbmc.python.pluginsource" provides="video">
     <provides>video</provides>
