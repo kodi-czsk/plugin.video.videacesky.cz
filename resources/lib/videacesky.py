@@ -20,26 +20,28 @@
 # *
 # */
 
+import sys
+
 import re
 import urllib
-# import cookielib
+import http.cookiejar
 from demjson import demjson
 
 import util
-import resolver
-from provider import ResolveException
-from provider import ContentProvider
+from contentprovider.provider import ResolveException
+from contentprovider.provider import ContentProvider
 import YDStreamExtractor
 
 
 class VideaceskyContentProvider(ContentProvider):
-    def __init__(self, username=None, password=None, filter=None,
+    def __init__(self, username=None, password=None, filter=None, original_yt=False,
                  tmp_dir='/tmp'):
         ContentProvider.__init__(self, 'videacesky.cz',
                                  'http://www.videacesky.cz',
                                  username, password, filter, tmp_dir)
-        # opener = urllib.build_opener(urllib.HTTPCookieProcessor(cookielib.LWPCookieJar()))
-        # urllib.install_opener(opener)
+        opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(http.cookiejar.LWPCookieJar()))
+        urllib.request.install_opener(opener)
+        self.original_yt = original_yt
 
     def capabilities(self):
         return ['categories', 'resolve', 'search']
@@ -131,6 +133,8 @@ class VideaceskyContentProvider(ContentProvider):
             # item['title'] = '%s - %s' % (m.group(1), k.group('name'))
             item['url'] = k.group('url')
             result.append(item)
+        print ('==list_content==')
+        print ('result')
         return result
 
     def list_related(self, page):
@@ -148,12 +152,12 @@ class VideaceskyContentProvider(ContentProvider):
         return result
 
     def format_title(self, m):
-    	return "{0} - {1}%".format(m.group('title'), m.group('rating'))
+        return "{0} - {1}%".format(m.group('title'), m.group('rating'))
 
     def format_rating(self, m):
-    	return "{0}%, {1}x".format(m.group('rating'), m.group('votes'))
+        return "{0}%, {1}x".format(m.group('rating'), m.group('votes'))
 
-    def decode_plot(self, m):
+    def decode_plot(self, m):        
         p = m.group('plot')
         p = re.sub('<br[^>]*>', '', p)
         p = re.sub('<div[^>]+>', '', p)
@@ -170,36 +174,45 @@ class VideaceskyContentProvider(ContentProvider):
         p = re.sub('\[B\]\[B\]', '[B]', p)
         p = re.sub('\[/B\]\[/B\]', '[/B]', p)
         p = re.sub('\[B\][ ]*\[/B\]', '', p)
-        plot = util.decode_html(''.join(p)).encode('utf-8').strip()
+        plot = util.decode_html(''.join(p)).strip()
+        #plot = util.decode_html(''.join(p)).encode('utf-8').strip()
         rating = self.format_rating(m)
         return "{0}\n{1}".format(rating, plot)
 
     def resolve(self, item, captcha_cb=None, select_cb=None):
+        original_yt = self.original_yt
+        self.info('original_yt  ' + str(original_yt) + ' ' + str(type(original_yt)))
         result = []
         resolved = []
         item = item.copy()
         url = self._url(item['url'])
         data = util.substr(util.request(url), 'async type', '</script>')
-        print('data start ----')
-        print(data)
-        print('data end ----')
+        # print ('data start ----')
+        # print (data)
+        # print ('data end ----')
         playlist = re.search('''new mfJWPlayer.+?(?P<jsondata>playlist:.+?)events:''',
                              data, re.MULTILINE | re.DOTALL)
-        print('playlist start ----')
-        print(playlist)
-        print('playlist end ----')
+        # print ('playlist start ----')
+        # print (playlist)
+        # print ('playlist end ----')
         jsondata = re.sub(' +',
                           ' ',
                           '{%s' % playlist.group('jsondata').replace('file:','"file":').replace('label:','"label":').replace('kind:','"kind":').replace('default:','"default":').replace('true','"true"').replace('],',']'))+'}'
-        print('jsondata start ----')
-        print(jsondata)
-        print('jsondata end ----')
+        # print ('jsondata start ----')
+        # print (jsondata)
+        # print ('jsondata end ----')
         jsondata = demjson.decode(jsondata)
 
         for playlist_item in jsondata['playlist']:
             playlist_item['file'] = playlist_item['file'].replace('time_continue=1&', '')
+            #self.info(playlist_item['file'])
+            if original_yt:
+                e = 'watch?v='
+                edx = playlist_item['file'].find(e)
+                video_id = playlist_item['file'][edx+len(e):]
             vid = YDStreamExtractor.getVideoInfo(playlist_item['file'], quality=3) #quality is 0=SD, 1=720p, 2=1080p, 3=Highest Available
             video_url = [vid.streams()[0]]
+            # self.info(video_url)
             subs = playlist_item['tracks']
             if video_url and subs:
                 for i in video_url:
@@ -216,10 +229,13 @@ class VideaceskyContentProvider(ContentProvider):
                 except KeyError:
                     pass
                 item['url'] = i['xbmc_url']
+                if original_yt:
+                    item['url'] = "plugin://plugin.video.youtube/?action=play_video&videoid=" + video_id
                 item['quality'] = i['ytdl_format']['height']
                 item['surl'] = i['ytdl_format']['webpage_url']
                 item['subs'] = i['subs']
                 item['headers'] = {}
+                # self.info(item)
                 try:
                     item['fmt'] = i['fmt']
                 except KeyError:
@@ -227,7 +243,10 @@ class VideaceskyContentProvider(ContentProvider):
                 result.append(item)
 
         if len(result) > 0 and select_cb:
+            # self.info(result)
             return select_cb(result)
-
+       
+        # print ('==resolve==')
+        # print (result)
         return result
 
