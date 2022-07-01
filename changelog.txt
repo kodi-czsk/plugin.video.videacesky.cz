@@ -1,3 +1,5 @@
+[B]1.1.2:[/B]
+- přejít k poradu
 [B]1.1.1:[/B]
 - oprava diakritiky (jastrab)
 - pridaná možnosť prehratia cez originál youtube plugin  (jastrab)

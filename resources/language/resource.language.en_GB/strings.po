@@ -94,6 +94,10 @@ msgctxt "#30061"
 msgid "Run original Youtube addon"
 msgstr ""
 
+msgctxt "#30062"
+msgid "Go to show"
+msgstr ""
+
 msgctxt "#30103"
 msgid "General"
 msgstr ""
