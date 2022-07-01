@@ -49,6 +49,8 @@ class VideaceskyContentProvider(ContentProvider):
             return self.list_top10(util.request(self.base_url+url))
         if url.find("#related#") == 0:
             return self.list_related(util.request(url[9:]))
+        if url.find("#show#") == 0:
+            return self.list_content(util.request(url[6:]))
         else:
             return self.list_content(util.request(self._url(url)), self._url(url))
 
@@ -101,7 +103,7 @@ class VideaceskyContentProvider(ContentProvider):
         if not url:
             url = self.base_url
         data = util.substr(page, '<div class=\"items no-wrapper no-padder', '<div class=\"my-pagination>')
-        pattern = '<article class=\"video\".+?<a href=\"(?P<url>[^\"]+)\" *title=\"(?P<title>[^\"]+)\"(.+?)<img src=\"(?P<img>[^\"]+)\".+?<span class=\"duration\">(?P<duration>[^>]*)</span>.*?<span class="rating.+?>(?P<rating>[^&]+).+?<p>(?P<plot>[^<]+?)<\/p>.+?<li class=\"i-published\".+?title=\"(?P<date>[^\"]+)\".+?<i class=\"fa fa-eye\"></i><span class=\"value\">(?P<votes>[^<]+)'
+        pattern = '<article class=\"video\".+?<a href=\"(?P<url>[^\"]+)\" *title=\"(?P<title>[^\"]+)\"(.+?)<img src=\"(?P<img>[^\"]+)\".+?<span class=\"duration\">(?P<duration>[^>]*)</span>.*?<span class="rating.+?>(?P<rating>[^&]+).+?<small><a href=\"(?P<show_url>[^\"]+)\">(?P<show_name>[^<]*)</a></small>.+?<p>(?P<plot>[^<]+?)<\/p>.+?<li class=\"i-published\".+?title=\"(?P<date>[^\"]+)\".+?<i class=\"fa fa-eye\"></i><span class=\"value\">(?P<votes>[^<]+)'
         for m in re.finditer(pattern, data, re.IGNORECASE | re.DOTALL):
             item = self.video_item()
             item['title'] = self.format_title(m)
@@ -109,8 +111,10 @@ class VideaceskyContentProvider(ContentProvider):
             item['plot'] = self.decode_plot(m)
             item['year'] = re.search('[0-9]{4}', m.group('date')).group()
             item['url'] = self.base_url[:-1] + m.group('url')
-            item['menu'] = {'$30060': {'list': '#related#' + item['url'],
-                                       'action-type': 'list'}}
+            item['menu'] = {
+                '$30060': {'list': '#related#' + item['url'],'action-type': 'list'},
+                '$30061': {'list': '#show#' + self.base_url + m.group('show_url')[1:],'action-type': 'list'}
+            }
             try:
                 item['duration'] = self.mmss_to_seconds(m.group('duration'))
             except ValueError:
