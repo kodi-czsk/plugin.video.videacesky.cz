@@ -25,6 +25,7 @@ sys.path.append(os.path.join (os.path.dirname(__file__), 'resources', 'lib'))
 import videacesky
 
 import xbmc
+import xbmcvfs
 import xbmcaddon
 import xbmcgui
 import xbmcplugin
@@ -165,6 +166,6 @@ if params == {}:
 	xbmcutil.init_usage_reporting(__scriptid__)
 # VideaceskyXBMCContentProvider(videacesky.VideaceskyContentProvider(tmp_dir=xbmc.translatePath(__addon__.getAddonInfo('profile'))), settings, __addon__).run(params)
 original_yt = __settings__('original_yt') == 'true'
-vc = videacesky.VideaceskyContentProvider(original_yt=original_yt, tmp_dir=xbmc.translatePath(__addon__.getAddonInfo('profile')))
+vc = videacesky.VideaceskyContentProvider(original_yt=original_yt, tmp_dir=xbmcvfs.translatePath(__addon__.getAddonInfo('profile')))
 
 VideaceskyXBMCContentProvider(vc, settings, __addon__).run(params)

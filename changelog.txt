@@ -1,3 +1,5 @@
+[B]1.1.3:[/B]
+- fix pro Kodi 20+
 [B]1.1.2:[/B]
 - přejít k poradu
 [B]1.1.1:[/B]
