@@ -57,7 +57,7 @@ class VideaceskyContentProvider(ContentProvider):
             return self.list_content(util.request(self._url(url)), self._url(url))
 
     def search(self, keyword):
-        return self.list('/hledat?q=' + urllib.quote(keyword))
+        return self.list('/hledat?q=' + urllib.parse.quote(keyword))
 
     def mmss_to_seconds(self, mmss):
         minutes, seconds = [int(x) for x in mmss.split(':')]
