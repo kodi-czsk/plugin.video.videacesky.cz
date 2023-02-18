@@ -30,8 +30,6 @@ from demjson import demjson
 import util
 from contentprovider.provider import ResolveException
 from contentprovider.provider import ContentProvider
-import YDStreamExtractor
-
 
 class VideaceskyContentProvider(ContentProvider):
     def __init__(self, username=None, password=None, filter=None, original_yt=False,
@@ -57,7 +55,7 @@ class VideaceskyContentProvider(ContentProvider):
             return self.list_content(util.request(self._url(url)), self._url(url))
 
     def search(self, keyword):
-        return self.list('/hledat?q=' + urllib.quote(keyword))
+        return self.list('/hledat?q=' + urllib.parse.quote(keyword))
 
     def mmss_to_seconds(self, mmss):
         minutes, seconds = [int(x) for x in mmss.split(':')]
@@ -210,41 +208,60 @@ class VideaceskyContentProvider(ContentProvider):
         for playlist_item in jsondata['playlist']:
             playlist_item['file'] = playlist_item['file'].replace('time_continue=1&', '')
             #self.info(playlist_item['file'])
+
             if original_yt:
                 e = 'watch?v='
                 edx = playlist_item['file'].find(e)
                 video_id = playlist_item['file'][edx+len(e):]
-            vid = YDStreamExtractor.getVideoInfo(playlist_item['file'], quality=3) #quality is 0=SD, 1=720p, 2=1080p, 3=Highest Available
-            video_url = [vid.streams()[0]]
-            # self.info(video_url)
-            subs = playlist_item['tracks']
-            if video_url and subs:
-                for i in video_url:
-                    i['subs'] = self.base_url[:-1]+subs[0]['file']
-            resolved += video_url[:]
-
-            if not resolved:
-                raise ResolveException('Video nenalezeno')
-
-            for i in resolved:
+                subs = playlist_item['tracks']
+                
                 item = self.video_item()
                 try:
-                    item['title'] = i['title']
+                    item['title'] = playlist_item['title']
                 except KeyError:
                     pass
-                item['url'] = i['xbmc_url']
-                if original_yt:
-                    item['url'] = "plugin://plugin.video.youtube/?action=play_video&videoid=" + video_id
-                item['quality'] = i['ytdl_format']['height']
-                item['surl'] = i['ytdl_format']['webpage_url']
-                item['subs'] = i['subs']
-                item['headers'] = {}
-                # self.info(item)
-                try:
-                    item['fmt'] = i['fmt']
-                except KeyError:
-                    pass
+
+                item['url'] = "plugin://plugin.video.youtube/?action=play_video&videoid=" + video_id
+                item['surl'] = playlist_item['image']
+                item['subs'] = self.base_url[:-1]+subs[0]['file']
+            
                 result.append(item)
+            else:
+                import YDStreamExtractor
+
+                vid = YDStreamExtractor.getVideoInfo(playlist_item['file'], quality=3) #quality is 0=SD, 1=720p, 2=1080p, 3=Highest Available
+
+                if vid is None:
+                    raise ResolveException('Zkus aktualizovat youtube-dl, nebo pouzij youtube addon')
+
+                video_url = [vid.streams()[0]]
+                # self.info(video_url)
+                subs = playlist_item['tracks']
+                if video_url and subs:
+                    for i in video_url:
+                        i['subs'] = self.base_url[:-1]+subs[0]['file']
+                resolved += video_url[:]
+
+                if not resolved:
+                    raise ResolveException('Video nenalezeno')
+
+                for i in resolved:
+                    item = self.video_item()
+                    try:
+                        item['title'] = i['title']
+                    except KeyError:
+                        pass
+                    item['url'] = i['xbmc_url']
+                    item['quality'] = i['ytdl_format']['height']
+                    item['surl'] = i['ytdl_format']['webpage_url']
+                    item['subs'] = i['subs']
+                    item['headers'] = {}
+                    # self.info(item)
+                    try:
+                        item['fmt'] = i['fmt']
+                    except KeyError:
+                        pass
+                    result.append(item)
 
         if len(result) > 0 and select_cb:
             # self.info(result)
