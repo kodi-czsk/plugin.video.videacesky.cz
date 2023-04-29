@@ -210,9 +210,7 @@ class VideaceskyContentProvider(ContentProvider):
             #self.info(playlist_item['file'])
 
             if original_yt:
-                e = 'watch?v='
-                edx = playlist_item['file'].find(e)
-                video_id = playlist_item['file'][edx+len(e):]
+                video_id = re.search(r"(youtu\.be/|watch\?v=)(.+)", playlist_item['file']).group(2)
                 subs = playlist_item['tracks']
                 
                 item = self.video_item()
@@ -221,7 +219,7 @@ class VideaceskyContentProvider(ContentProvider):
                 except KeyError:
                     pass
 
-                item['url'] = "plugin://plugin.video.youtube/?action=play_video&videoid=" + video_id
+                item['url'] = "plugin://plugin.video.youtube/play/?video_id=" + video_id
                 item['surl'] = playlist_item['image']
                 item['subs'] = self.base_url[:-1]+subs[0]['file']
             
