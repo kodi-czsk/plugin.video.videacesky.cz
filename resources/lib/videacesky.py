@@ -103,7 +103,7 @@ class VideaceskyContentProvider(ContentProvider):
         if not url:
             url = self.base_url
         data = util.substr(page, '<div class=\"items no-wrapper no-padder', '<div class=\"my-pagination>')
-        pattern = '<article class=\"video\".+?<a href=\"(?P<url>[^\"]+)\" *title=\"(?P<title>[^\"]+)\"(.+?)<img src=\"(?P<img>[^\"]+)\".+?<span class=\"duration\">(?P<duration>[^>]*)</span>.*?<span class="rating.+?>(?P<rating>[^&]+).+?<small><a href=\"(?P<show_url>[^\"]+)\">(?P<show_name>[^<]*)</a></small>.+?<p>(?P<plot>[^<]+?)<\/p>.+?<li class=\"i-published\".+?title=\"(?P<date>[^\"]+)\".+?<i class=\"fa fa-eye\"></i><span class=\"value\">(?P<votes>[^<]+)'
+        pattern = '<article class=\"video[ ]?(?P<collection>[^\"]*)\" id=.+?<a href=\"(?P<url>[^\"]+)\" *title=\"(?P<title>[^\"]+)\".+?<img src=\"(?P<img>[^\"]+)\".+?<span class=\"duration\">(?P<duration>[^>]*)</span>.*?<span class="rating[^"]+">(?P<rating>[^&]+).+?<a href=\"(?P<show_url>[^\"]+)\" title=.+?<p>(?P<plot>[^<]+?)<\/p>.+?<li class=\"i-published\".+?title=\"(?P<date>[^\"]+)\".+?<i class=\"fa fa-eye\"></i><span class=\"value\">(?P<votes>[^<]+)'
         for m in re.finditer(pattern, data, re.IGNORECASE | re.DOTALL):
             item = self.video_item()
             item['title'] = self.format_title(m)
@@ -154,7 +154,11 @@ class VideaceskyContentProvider(ContentProvider):
         return result
 
     def format_title(self, m):
-        return "{0} - {1}%".format(m.group('title'), m.group('rating'))
+        collection = m.group('collection')
+        if collection is not None and len(collection) > 0:
+            return "{0} - {1}%, {2}".format(m.group('title'), m.group('rating'), collection)
+        else:
+            return "{0} - {1}%".format(m.group('title'), m.group('rating'))
 
     def format_rating(self, m):
         return "{0}%, {1}x".format(m.group('rating'), m.group('votes'))
